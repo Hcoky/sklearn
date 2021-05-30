@@ -1,0 +1,15 @@
+from sklearn.datasets import load_boston
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.model_selection import cross_val_score
+import matplotlib.pyplot as plt
+
+boston = load_boston()
+# 获取一个随机种子，这个随机种子得到的结果是不变的
+regressor = DecisionTreeRegressor(random_state=0)
+R_squared = cross_val_score(regressor,boston.data,boston.target,cv = 10)
+
+plt.plot(R_squared,label = "R_squared")
+plt.plot([R_squared.mean()]*len(R_squared),label = "mean")
+plt.legend()
+plt.show()
+print(R_squared.mean())
