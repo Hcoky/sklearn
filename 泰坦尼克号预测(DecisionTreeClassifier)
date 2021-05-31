@@ -1,0 +1,89 @@
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import cross_val_score
+import matplotlib.pyplot as plt
+
+data = pd.read_csv(r"D:\Users\lenovo\Downloads\train.csv")
+
+data.drop(['Name', 'Ticket', 'Cabin'], inplace=True, axis=1)
+data['Age'] = data['Age'].fillna(data['Age'].mean())
+data.dropna(inplace=True, axis=0)
+
+data['Sex'] = (data['Sex'] == 'male').astype('int')
+
+label = data['Embarked'].unique().tolist()
+
+# 把['S', 'C', 'Q']分为1,2,3
+data['Embarked'] = data['Embarked'].apply(lambda x: label.index(x))  # label.index('S')即使‘S’所在的下标
+
+y = data.iloc[:, data.columns == 'Survived']
+x = data.iloc[:, data.columns != 'Survived']  # x = data.drop('Survived',axis=1)
+
+X_train, X_test, Y_train, Y_test = train_test_split(x, y, test_size=0.3)
+# X_train的索引乱了
+#      PassengerId  Pclass  Sex        Age  SibSp  Parch     Fare  Embarked
+# 223          224       3    1  29.699118      0      0   7.8958         0
+# 381          382       3    0   1.000000      0      2  15.7417         1
+# 222          223       3    1  51.000000      0      0   8.0500         0
+# 38            39       3    0  18.000000      2      0  18.0000         0
+# 227          228       3    1  20.500000      0      0   7.2500         0
+# ..           ...     ...  ...        ...    ...    ...      ...       ...
+# 477          478       3    1  29.000000      1      0   7.0458         0
+# 252          253       1    1  62.000000      0      0  26.5500         0
+# 344          345       2    1  36.000000      0      0  13.0000         0
+# 711          712       1    1  29.699118      0      0  26.5500         0
+# 547          548       2    1  29.699118      0      0  13.8625         1
+
+
+for i in [X_train, X_test, Y_train, Y_test]:  # X_train.index = range(X_train.shape[0])
+    i.index = range(i.shape[0])
+
+clf = DecisionTreeClassifier(criterion='entropy')
+clf = clf.fit(X_train, Y_train)
+score = clf.score(X_test, Y_test)
+trs = clf.score(X_train, Y_train)
+
+tr = []
+te_max = []
+te_mean = []
+te_min = []
+
+
+for i in range(10):
+    clf = DecisionTreeClassifier(
+        criterion="entropy",
+        max_depth=i + 1
+    )
+    clf = clf.fit(X_train, Y_train)
+    trs = clf.score(X_train, Y_train)
+    tes_max = cross_val_score(clf, x, y, cv=10).max()
+    tes_mean = cross_val_score(clf, x, y, cv=10).mean()
+    tes_min = cross_val_score(clf, x, y, cv=10).min()
+    tr.append(trs)
+    te_max.append(tes_max)
+    te_mean.append(tes_mean)
+    te_min.append(tes_min)
+
+plt.figure(figsize=[15, 10])
+plt.plot(range(1, 11), tr, label="train", color='cornflowerblue')
+plt.plot(range(1, 11), te_max, label="te_max", color='red')
+plt.plot(range(1, 11), te_mean, label="te_mean", color='green')
+plt.plot(range(1, 11), te_min, label="te_min", color='darkorange')
+plt.xticks(range(1, 11))
+plt.legend()
+plt.show()
+
+print(data.info())
+print(data)
+print(label)
+print(label.index('S'))
+print(x)
+print(X_train.shape, X_test.shape, Y_train.shape, Y_test.shape)
+print(X_train)
+print(score)
+print(trs)
+print(tes_max)
+print(tes_mean)
+print(tes_min)
+print(tr)
