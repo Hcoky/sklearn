@@ -1,0 +1,15 @@
+import pandas as pd
+#函数应用和映射
+import numpy as np
+import pandas as pd
+df=pd.DataFrame(np.random.randn(4,3),columns=list('bde'),index=['utah','ohio','texas','oregon'])
+print("df{}\n\n\n\n".format(df))
+#将函数应用到由各列或行形成的一维数组上。DataFrame的apply方法可以实现此功能
+f=lambda x:x.max()-x.min()
+#默认情况下会以列为单位，分别对列应用函数
+t1=df.apply(f)
+print(t1,"\n\n\n")
+t2=df.apply(f,axis=1)
+print(t2,"\n\n\n")
+print(f)
+
