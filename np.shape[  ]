@@ -1,0 +1,9 @@
+import numpy as np
+k = np.matrix([[1, 2, 3, 4],
+             [5, 6, 7, 8],
+             [9, 10, 11, 12]])
+
+print(k)
+print(np.shape(k))       # 输出（3，4）表示矩阵为3行4列
+print(k.shape[0])        # shape[0]输出3，为矩阵的行数
+print(k.shape[1])        # 同理shape[1]输出列数
